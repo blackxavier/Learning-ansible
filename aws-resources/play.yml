@@ -1,0 +1,8 @@
+---
+- hosts: localhost 
+  connection: local
+  vars:
+    data: ec2/secrets
+  roles:
+    - ec2-role
+   

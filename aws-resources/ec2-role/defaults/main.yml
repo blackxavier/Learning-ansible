@@ -1,0 +1,4 @@
+---
+instance_type: "t2.micro"
+region: "af-south-1"
+image_id: "ami-0c13b2d84424f9d8d"
