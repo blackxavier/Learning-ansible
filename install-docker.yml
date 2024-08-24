@@ -1,0 +1,11 @@
+---
+- hosts: example
+  become: yes
+  remote_user: ubuntu
+  vars:
+    docker_users:
+      - ubuntu
+  roles:
+    - geerlingguy.pip
+    - geerlingguy.docker
+    
