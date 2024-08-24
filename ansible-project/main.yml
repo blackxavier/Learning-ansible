@@ -1,0 +1,22 @@
+---
+- hosts: localhost
+  connection: local
+  vars:
+    data: ec2/secrets
+  roles:
+    - project
+
+- hosts: ubuntu
+  vars:
+    data: ec2/secrets
+  become: true
+
+  tasks:
+    - name: Retrieve secret using aws_secret lookup
+      ansible.builtin.set_fact:
+        my_secret: "{{ lookup('amazon.aws.aws_secret', data) }}"
+
+    - name: Shutdown ubuntu instances only
+      ansible.builtin.command: /sbin/shutdown -t now
+      when:
+        - ansible_facts['os_family'] == "Debian"

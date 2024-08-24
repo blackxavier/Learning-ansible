@@ -1,0 +1,6 @@
+---
+instance_type: "t3.micro"
+region: "af-south-1"
+image_id_ubuntu: "ami-0c13b2d84424f9d8d"
+image_id_amz_linux: "ami-05cb2de2b80a96127"
+key_name: "capetown"

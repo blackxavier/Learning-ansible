@@ -1,0 +1,12 @@
+[all]
+ubuntu@13.246.2.30
+ubuntu@13.245.164.252
+ec2-user@13.244.112.100
+
+[ubuntu]
+ubuntu@13.246.2.30
+ubuntu@13.245.164.252
+
+
+[amazon-linux]
+ec2-user@13.244.112.100

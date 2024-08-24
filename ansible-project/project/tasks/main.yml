@@ -1,0 +1,58 @@
+---
+- name: Retrieve secret using aws_secret lookup
+  ansible.builtin.set_fact:
+    my_secret: "{{ lookup('amazon.aws.aws_secret', data) }}"
+
+- name: start 3 instances with a public IP address
+  amazon.aws.ec2_instance:
+    name: "{{ item.name }}"
+    key_name: "{{ key_name }}"
+    instance_type: "{{ instance_type }}"
+    security_group: default
+    region: "{{region}}"
+    aws_access_key: "{{my_secret.aws_access_key}}"
+    aws_secret_key: "{{my_secret.aws_secret_key}}"
+    network:
+      assign_public_ip: true
+    image_id: "{{item.image}}"
+    tags:
+      Environment: Testing
+
+  loop:
+    - { image: "{{ image_id_ubuntu }}", name: "node1" }
+    - { image: "{{ image_id_ubuntu }}", name: "node2" }
+    - { image: "{{ image_id_amz_linux }}", name: "node3" }
+
+- name: Wait for EC2 instances to be running
+  amazon.aws.ec2_instance_info:
+    region: "{{ region }}"
+    aws_access_key: "{{ my_secret.aws_access_key }}"
+    aws_secret_key: "{{ my_secret.aws_secret_key }}"
+    filters:
+      "tag:Environment": "Testing"
+  register: ec2_info
+  until: ec2_info.instances | map(attribute='state.name') | select('match', 'running') | list | length == 3
+  retries: 10
+  delay: 30
+
+- name: Debug ec2_info output
+  ansible.builtin.debug:
+    var: ec2_info
+
+- name: Retrieve public IPs of newly created instances
+  amazon.aws.ec2_instance_info:
+    region: "{{ region }}"
+    aws_access_key: "{{ my_secret.aws_access_key }}"
+    aws_secret_key: "{{ my_secret.aws_secret_key }}"
+    filters:
+      "tag:Environment": "Testing"
+  register: ec2_info
+# - name: Extract public IPs
+#   ansible.builtin.set_fact:
+#     public_ips: "{{ ec2_info.instances.public_ip_address| selectattr('public_ip_address', 'defined') | map(attribute='public_ip_address') | list }}"
+#   loop: "{{ ec2_info.instances }}"
+
+# - name: Write public IPs to file
+#   ansible.builtin.copy:
+#     dest: /arinze/learn-ansible/public_ips.txt
+#     content: "{{ public_ips | join('\n') }}\n"
