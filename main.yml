@@ -2,16 +2,6 @@
 - hosts: example
   become: yes # elevate to root priviledges using 'sudo'
   remote_user: ubuntu # user that should be used to access the remote nodes
-  tasks: 
-    - name: Install Apache
-      ansible.builtin.apt:
-        name: apache2
-        state: present
-        update_cache: yes
-    - name: Copy Files
-      ansible.builtin.copy:
-        src: index.html
-        dest: /var/www/html
-        owner: root
-        group: root
-        mode: '0664'
+  roles:
+    - webserver
+    
