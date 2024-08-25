@@ -60,4 +60,5 @@ pyvenv.cfg
 venv/
 pip-selfcheck.json
 capetown.pem
+Notes
 # End of https://www.toptal.com/developers/gitignore/api/venv,ansible,ansibletower,git

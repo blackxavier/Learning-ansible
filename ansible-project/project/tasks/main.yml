@@ -8,7 +8,7 @@
     name: "{{ item.name }}"
     key_name: "{{ key_name }}"
     instance_type: "{{ instance_type }}"
-    security_group: default
+    security_group: "{{security_group}}"
     region: "{{region}}"
     aws_access_key: "{{my_secret.aws_access_key}}"
     aws_secret_key: "{{my_secret.aws_secret_key}}"
@@ -34,19 +34,18 @@
   until: ec2_info.instances | map(attribute='state.name') | select('match', 'running') | list | length == 3
   retries: 10
   delay: 30
+# - name: Debug ec2_info output
+#   ansible.builtin.debug:
+#     var: ec2_info
 
-- name: Debug ec2_info output
-  ansible.builtin.debug:
-    var: ec2_info
-
-- name: Retrieve public IPs of newly created instances
-  amazon.aws.ec2_instance_info:
-    region: "{{ region }}"
-    aws_access_key: "{{ my_secret.aws_access_key }}"
-    aws_secret_key: "{{ my_secret.aws_secret_key }}"
-    filters:
-      "tag:Environment": "Testing"
-  register: ec2_info
+# - name: Retrieve public IPs of newly created instances
+#   amazon.aws.ec2_instance_info:
+#     region: "{{ region }}"
+#     aws_access_key: "{{ my_secret.aws_access_key }}"
+#     aws_secret_key: "{{ my_secret.aws_secret_key }}"
+#     filters:
+#       "tag:Environment": "Testing"
+#   register: ec2_info
 # - name: Extract public IPs
 #   ansible.builtin.set_fact:
 #     public_ips: "{{ ec2_info.instances.public_ip_address| selectattr('public_ip_address', 'defined') | map(attribute='public_ip_address') | list }}"

@@ -1,0 +1,17 @@
+---
+- hosts: all
+  become: yes
+  vars:
+    data: ec2/secrets
+
+  tasks:
+    - name: Retrieve secret using aws_secret lookup
+      ansible.builtin.set_fact:
+        my_secret: "{{ lookup('amazon.aws.aws_secret', data) }}"
+    - name: Print all gathered facts
+      ansible.builtin.debug:
+        var: ansible_facts
+    - name: shutdown debian instances on AWS account
+      ansible.builtin.command: /sbin/shutdown -t now
+      when:
+        - ansible_facts['os_family'] == "Debian"
