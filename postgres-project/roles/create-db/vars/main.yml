@@ -1,0 +1,5 @@
+---
+data: ec2/secrets
+projectdb: project2-user
+projectuser: project2-user
+projectuser_password: project2-user

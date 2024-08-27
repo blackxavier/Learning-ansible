@@ -1,0 +1,53 @@
+---
+- name: Install venv for Python 3
+  ansible.builtin.apt:
+    name: python3-venv
+    state: present
+    update_cache: yes
+
+- name: Create a virtual environment for PostgreSQL
+  ansible.builtin.command: python3 -m venv /opt/pg_venv
+  args:
+    creates: /opt/pg_venv/bin/activate
+
+- name: Install psycopg2 in the virtual environment
+  ansible.builtin.pip:
+    name: psycopg2-binary
+    virtualenv: /opt/pg_venv
+
+- name: Update apt and install packages
+  ansible.builtin.apt:
+    update_cache: yes
+    name: 
+      - postgresql
+    state: present
+
+- name: Start service
+  ansible.builtin.service:
+    name: postgresql
+    state: started
+    enabled: yes
+
+- name: Allow password authentication for local connections
+  ansible.builtin.lineinfile:
+    path: /etc/postgresql/*/main/pg_hba.conf
+    regexp: '^local\s+all\s+postgres\s+peer'
+    line: 'local   all   postgres   md5'
+  become: yes
+
+- name: Restart PostgreSQL
+  ansible.builtin.service:
+    name: postgresql
+    state: restarted
+  become: yes
+# - name: Install pip for Python 3
+#   ansible.builtin.apt:
+#     name: python3-pip
+#     state: present
+#     update_cache: yes
+
+# - name: Install psycopg2 using pip
+#   ansible.builtin.pip:
+#     name: psycopg2-binary
+#     state: present
+#   become: yes

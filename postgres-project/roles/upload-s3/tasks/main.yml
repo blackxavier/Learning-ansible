@@ -1,0 +1,15 @@
+---
+- name: Retrieve secret using aws_secret lookup
+  ansible.builtin.set_fact:
+    my_secret: "{{ lookup('amazon.aws.aws_secret', data) }}"
+
+- name: Upload SQL dump to S3
+  amazon.aws.aws_s3:
+    bucket: "{{ bucket }}"
+    object: mydb_dump.sql
+    src: ./mydb_dump.sql
+    mode: put
+    aws_access_key: "{{ my_secret.aws_access_key }}"
+    aws_secret_key: "{{ my_secret.aws_secret_key }}"
+    region: "{{ region }}"
+  

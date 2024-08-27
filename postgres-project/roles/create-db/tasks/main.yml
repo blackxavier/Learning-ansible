@@ -1,0 +1,39 @@
+---
+- name: Retrieve secret using aws_secret lookup
+  ansible.builtin.set_fact:
+    my_secret: "{{ lookup('amazon.aws.aws_secret', data) }}"
+
+- name: Set Python interpreter to use virtual environment
+  ansible.builtin.set_fact:
+    ansible_python_interpreter: /opt/pg_venv/bin/python
+
+- name: Create DB user
+  ansible.builtin.postgresql_user:
+    login_user: postgres
+    name: "{{ projectuser }}"
+    password: "{{ my_secret.aws_access_key }}"
+    state: present
+    role_attr_flags: CREATEDB
+
+- name: Create PostgreSQL database
+  ansible.builtin.postgresql_db:
+    login_user: postgres
+    name: "{{ projectdb }}"
+    owner: "{{ projectuser }}"
+    state: present
+
+- name: GRANT ALL PRIVILEGES ON DATABASE {{projectdb}} TO {{projectuser}}
+ 
+  community.postgresql.postgresql_privs:
+    login_user: postgres
+    db: "{{projectdb}}"
+    privs: ALL
+    type: database
+    obj: "{{projectdb}}"
+    role: "{{ projectuser }}"
+
+
+
+- name: Reset Python interpreter
+  ansible.builtin.set_fact:
+    ansible_python_interpreter: /usr/bin/python3

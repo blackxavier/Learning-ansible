@@ -1,0 +1,12 @@
+---
+- name: Extract database data to a file
+  ansible.builtin.shell: |
+    sudo -u postgres pg_dump  > /tmp/mydb_dump.sql
+  args:
+    executable: /bin/bash
+
+- name: Fetch SQL dump file to local machine
+  ansible.builtin.fetch:
+    src: /tmp/mydb_dump.sql
+    dest: ./mydb_dump.sql
+    flat: yes

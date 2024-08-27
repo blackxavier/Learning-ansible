@@ -1,0 +1,24 @@
+---
+- name: Setup PostgreSQL, create DB, insert data, extract, and upload to S3
+  hosts: postgresql
+  become: yes
+  tasks:
+    - name: Include setup_postgresql role
+      include_role:
+        name: setup-postgresql
+
+    - name: Include create_db role
+      include_role:
+        name: create-db
+
+    - name: Include insert_data role
+      include_role:
+        name: insert-data
+
+    - name: Include extract_data role
+      include_role:
+        name: upload-data
+
+    - name: Include upload_to_s3 role
+      include_role:
+        name: upload-s3

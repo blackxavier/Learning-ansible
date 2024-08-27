@@ -1,0 +1,7 @@
+---
+- name: Insert dummy data into the database
+  ansible.builtin.shell: |
+    sudo -u postgres psql -d {{ projectdb }} -c "CREATE TABLE employees (id serial PRIMARY KEY, name VARCHAR(50), age INT);"
+    sudo -u postgres psql -d {{ projectdb }}  -c "INSERT INTO employees (name, age) VALUES ('Alice', 30), ('Bob', 25), ('Charlie', 35);"
+  args:
+    executable: /bin/bash
