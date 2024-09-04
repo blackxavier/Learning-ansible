@@ -1,0 +1,11 @@
+---
+solr_temp_directory: /tmp
+solr_directory: /opt/solr
+solr_version: 8.11.3
+solr_port: 8983
+solr_checksum: "sha512:7277516c0824c58cb968a5c061844b6dd895469d413aceadc91426a95c5aae70ca5d0e9c6f194d07cb6df155dae906136abe1f0cd89352b58829a7e6bee4a993"
+solr_user: solr
+solr_data_directory: /var/solr
+solr_service_name: solr
+solr_download_url: "https://www.apache.org/dyn/closer.lua/lucene/solr/{{solr_version}}/solr-{{solr_version}}-src.tgz?action=download"
+

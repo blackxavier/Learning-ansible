@@ -1,0 +1,81 @@
+---
+- hosts: solr
+  become: true
+
+  vars_files:
+    - vars.yml
+  pre_tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+  handlers:
+    - name: Restart solr
+      ansible.builtin.service:
+        name: solr
+        state: restarted
+  tasks:
+    - name: Install Java
+      ansible.builtin.apt:
+        name: openjdk-11-jdk
+        state: present
+        
+    - name: Download solr
+      ansible.builtin.get_url:
+        url: "{{solr_download_url}}"
+        dest: "{{solr_temp_directory}}/solr-{{solr_version}}.tgz"
+        checksum: "{{solr_checksum}}"
+         
+
+    - name: Unarchive solr
+      ansible.builtin.unarchive:
+        src: "{{solr_temp_directory}}/solr-{{solr_version}}.tgz"
+        dest: "{{solr_temp_directory}}"
+        remote_src: yes
+        creates: "{{solr_temp_directory}}/solr-{{solr_version}}/README.txt"
+    
+    - name: Ensure correct permissions to run installation script
+      ansible.builtin.file:
+        path: "{{ solr_temp_directory }}/solr-{{ solr_version }}/solr/bin/install_solr_service.sh"
+        mode: '0775'
+
+    - name: Ensure Solr installation directory exists
+      ansible.builtin.file:
+        path: "{{ solr_directory }}"
+        state: directory
+        mode: '0755'
+      
+
+    - name: Run solr installation script
+      ansible.builtin.command: >
+        "{{solr_temp_directory}}/solr-{{solr_version}}/solr/bin/install_solr_service.sh"
+        "{{solr_temp_directory}}/solr-{{solr_version}}.tgz"
+        -i "{{solr_directory}}"
+        -d "{{solr_data_directory}}"
+        -u "{{solr_user}}"
+        -s "{{solr_service_name}}"
+        -p "{{solr_port}}"
+      args:
+        creates: "{{solr_directory}}/solr/README.txt"
+      register: install_result
+
+    - name: Debug - Show installation script output
+      ansible.builtin.debug:
+        var: install_result.stdout_lines
+
+    - name: Debug - List services
+      ansible.builtin.command: systemctl list-units --type=service
+      register: service_list
+
+    - name: Debug - Show service list
+      ansible.builtin.debug:
+        var: service_list.stdout_lines
+
+    - name: Ensure solr is started and enabled
+      ansible.builtin.service:
+        name: "{{ solr_service_name }}"
+        state: started
+        enabled: yes
+
+ 
+        
