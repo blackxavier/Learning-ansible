@@ -1,3 +1,3 @@
 [postgresql]
-mydbserver ansible_host=13.247.89.117 ansible_user=ubuntu ansible_ssh_private_key_file=~/learn-ansible/capetown.pem
+mydbserver ansible_host=13.245.229.124 ansible_user=ubuntu ansible_ssh_private_key_file=~/learn-ansible/capetown.pem
 

@@ -1,0 +1,28 @@
+---
+postgresql_python_library: python3-psycopg2
+postgresql_users:
+  - name: "{{db_user}}"
+    password: "{{db_password}}"
+    role_attr_flags: CREATEDB
+postgresql_databases:
+  - name: "{{db_name}}"
+    owner: "{{db_user}}"
+postgresql_global_config_options:
+  - option: listen_addresses
+    value: '*'
+
+# Add this to allow connections from all addresses (adjust as needed for security)
+postgresql_hba_entries:
+  - { type: host, database: all, user: all, address: "{{allowed_address_range}}", auth_method: md5 }
+
+# Dummy data insertion
+dummy_data_query: >
+  INSERT INTO users (name, email) VALUES 
+  ('John Doe', 'john@example.com'),
+  ('Jane Smith', 'jane@example.com');
+
+
+# Add this line to define the log directory
+# Add this line
+log_directory: "{{ postgresql_log_dir }}"
+postgresql_log_dir: /var/log/postgresql

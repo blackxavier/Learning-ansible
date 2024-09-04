@@ -1,0 +1,35 @@
+---
+- name: Install Apache
+  hosts: app
+  become: yes
+
+  tasks:
+    - name: Install httpd 
+      yum: 
+        name: httpd 
+        state: present 
+
+    - name: Start httpd
+      service:
+        name: httpd
+        state: started
+        enabled: true
+
+    - name: Copy config files
+      copy:
+        src: "{{item.src}}"
+        dest: "{{item.dest}}"
+        mode: '0644'
+        owner: root
+        group: root
+      loop:
+        - src: httpd.conf
+          dest: /etc/httpd/conf/httpd.conf
+        - src: httpd-vhosts.conf
+          dest: /etc/httpd/conf/httpd-vhosts.conf
+
+    - name: Restart httpd
+      service:
+        name: httpd
+        state: restarted
+        

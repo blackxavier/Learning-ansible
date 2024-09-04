@@ -23,7 +23,6 @@
     state: present
 
 - name: GRANT ALL PRIVILEGES ON DATABASE {{projectdb}} TO {{projectuser}}
- 
   community.postgresql.postgresql_privs:
     login_user: postgres
     db: "{{projectdb}}"

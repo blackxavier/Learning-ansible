@@ -1,0 +1,2 @@
+[app]
+server1 ansible_host=13.246.193.101 ansible_user=ec2-user ansible_ssh_private_key_file=~/learn-ansible/capetown.pem
