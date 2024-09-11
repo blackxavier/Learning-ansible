@@ -15,23 +15,45 @@
       ansible.builtin.service:
         name: solr
         state: restarted
+
   tasks:
     - name: Install packages
       ansible.builtin.apt:
         name:
           - default-jdk
+
+    - name: Check if Solr is already installed
+      ansible.builtin.systemd:
+        name: solr
+        state: started
+      register: solr_status
+      ignore_errors: true
+
     - name: Download solr package
-      ansible.builtin.command:
-        cmd: wget https://archive.apache.org/dist/lucene/solr/8.9.0/solr-8.9.0.tgz
-    - name: Unarchive solr 
-      ansible.builtin.command:
-        cmd: sudo tar xzf solr-8.9.0.tgz
+      ansible.builtin.get_url:
+        url:  "{{solr_download_url}}"
+        dest: "{{solr_temp_directory}}/{{solr_version}}.tgz"
+        mode: '0644'
+      when: solr_status is failed 
+
+    - name: Extract Solr package
+      ansible.builtin.unarchive:
+        src: "{{solr_temp_directory}}/{{solr_version}}.tgz"
+        dest: /tmp/
+        remote_src: yes
+      when: solr_status is failed 
+
     - name: Install Apache solr
-      ansible.builtin.command:
-        cmd: sudo bash solr-8.9.0/bin/install_solr_service.sh solr-8.9.0.tgz
+      ansible.builtin.shell:
+        cmd: bash /tmp/solr-8.9.0/bin/install_solr_service.sh /tmp/solr-8.9.0.tgz
+      args:
+        creates: /opt/solr
+      when: solr_status is failed 
+
     - name: Enable Solr service
       ansible.builtin.systemd:
         name: solr
         enabled: yes
         daemon_reload: yes
+      when: solr_status is failed 
         

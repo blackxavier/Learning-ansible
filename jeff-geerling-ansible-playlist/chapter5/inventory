@@ -1,0 +1,2 @@
+[server]
+app ansible_host=13.246.3.144 ansible_user=ubuntu ansible_ssh_private_key_file=~/learn-ansible/capetown.pem

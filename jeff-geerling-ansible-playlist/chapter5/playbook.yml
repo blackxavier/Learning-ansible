@@ -1,0 +1,48 @@
+---
+- hosts: all
+  become: yes
+
+  handlers:
+    - name: Restart Apache 
+      ansible.builtin.service:
+        name: apache2
+        state: restarted
+  
+  pre_tasks:
+    - name: Update apt packages
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+  
+  tasks:
+    - name: Install Apache
+      ansible.builtin.apt:
+        name:
+          - apache2
+        state: present
+    
+    - name: Ensure the Apache service is started and enabled
+      ansible.builtin.service:
+        name: apache2
+        state: started
+        enabled: yes
+
+    - name: Change Apache configuration
+      ansible.builtin.lineinfile:
+        path: /etc/apache2/apache2.conf
+        regexp: '^#ServerName'
+        line: 'ServerName localhost'
+      notify: Restart Apache  
+    
+    - name: Flush handlers
+      ansible.builtin.meta:
+        flush_handlers
+    
+    - name: Create a test HTML file
+      ansible.builtin.copy:
+        content: "<h1>Apache is running!</h1>"
+        dest: /var/www/html/index.html
+    
+    - name: Flush handlers
+      ansible.builtin.meta:
+        flush_handlers
